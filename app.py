@@ -8,6 +8,35 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 import csv
 
+
+def parse_notary_info(notary_text):
+    parts = notary_text.split("\n")
+    if len(parts) >= 2:
+        name_part = parts[0].strip()
+        address_part = ", ".join(parts[1:]).strip()
+
+        name_parts = name_part.split(" ")
+        first_name = name_parts[0]
+        second_name = ""
+        last_name = ""
+
+        if len(name_parts) > 2:
+            second_name = name_parts[1]
+            last_name = " ".join(name_parts[2:])
+        elif len(name_parts) == 2:
+            last_name = name_parts[1]
+
+        address_parts = address_part.split(", ")
+        # Identify the second to last word
+        second_to_last_word = address_parts[-2] if len(address_parts) > 1 else ""
+        # Remove the last two words for the modified address
+        modified_address = ", ".join(address_parts[:-2])
+
+        return [first_name, second_name, last_name, modified_address, second_to_last_word]
+    else:
+        return ["", "", "", "", ""]
+
+
 # Path to your ChromeDriver executable
 PATH = "C:\\Program Files (x86)\\chromedriver-win64\\chromedriver.exe"
 cService = ChromeService(executable_path=PATH)
@@ -46,7 +75,7 @@ try:
         with open(csv_file, mode='a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
             for name in all_notary_names:
-                writer.writerow([name])
+                writer.writerow(parse_notary_info(name))
 
         next_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, '.pager__item--arrow--right a[rel="next"]')))
