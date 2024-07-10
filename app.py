@@ -53,7 +53,7 @@ try:
         next_button.click()
         print(f"Clicked on Next button for page {page + 1}")
 
-        time.sleep(5)
+        time.sleep(1)
         all_notary_names.clear()
 
 except TimeoutException as e:
